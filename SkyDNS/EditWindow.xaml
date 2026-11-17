@@ -1,0 +1,129 @@
+<Window x:Class="SkyDNS.EditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:SkyDNS"
+        Title="SkyDNS" Width="480" SizeToContent="Height"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        FontFamily="{StaticResource UiFont}" Foreground="{StaticResource Ink}" FlowDirection="{Binding Flow}"
+        UseLayoutRounding="True">
+  <Window.Resources>
+    <Style x:Key="Swatch" TargetType="RadioButton">
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Margin" Value="0,0,6,0"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="RadioButton">
+            <Grid Width="32" Height="32" Background="Transparent">
+              <Ellipse x:Name="ring" Stroke="{TemplateBinding Background}" StrokeThickness="2" Opacity="0"/>
+              <Ellipse Margin="5" Fill="{TemplateBinding Background}"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsChecked" Value="True"><Setter TargetName="ring" Property="Opacity" Value="1"/></Trigger>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="ring" Property="Opacity" Value="0.4"/></Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style x:Key="IconOpt" TargetType="RadioButton">
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Margin" Value="0,0,6,0"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="RadioButton">
+            <Border x:Name="bd" Width="38" Height="38" CornerRadius="8" BorderThickness="1" BorderBrush="{StaticResource Line}" Background="{StaticResource Cloud}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource RowHover}"/></Trigger>
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Sky}"/>
+                <Setter TargetName="bd" Property="Background" Value="{StaticResource SkySoft}"/>
+                <Setter Property="Foreground" Value="{StaticResource Sky}"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+  </Window.Resources>
+
+  <Border Margin="20" Background="{StaticResource Cloud}" CornerRadius="12" BorderBrush="{StaticResource Line}" BorderThickness="1">
+    <Border.Effect><DropShadowEffect BlurRadius="28" ShadowDepth="6" Opacity="0.22" Color="#0A2A55"/></Border.Effect>
+    <StackPanel>
+      <Grid Margin="22,20,22,6" Background="Transparent" MouseLeftButtonDown="Drag">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Border x:Name="Preview" Width="40" Height="40" CornerRadius="10">
+          <TextBlock x:Name="PreviewGlyph" FontFamily="{StaticResource IconFont}" FontSize="19" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+        <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+          <TextBlock x:Name="TitleText" FontSize="16" FontWeight="Medium"/>
+          <TextBlock Text="{local:T saveHint}" FontSize="12" Foreground="{StaticResource Muted}" Margin="0,2,0,0"/>
+        </StackPanel>
+      </Grid>
+
+      <StackPanel Margin="22,16,22,18">
+        <TextBlock Text="{local:T name}" Style="{StaticResource Label}"/>
+        <TextBox x:Name="NameBox" Style="{StaticResource Input}" Margin="0,0,0,14"/>
+
+        <Grid Margin="0,0,0,14">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="12"/>
+            <ColumnDefinition/>
+          </Grid.ColumnDefinitions>
+          <StackPanel>
+            <TextBlock Text="{local:T primary}" Style="{StaticResource Label}"/>
+            <TextBox x:Name="PrimaryBox" Style="{StaticResource Input}" FontFamily="{StaticResource MonoFont}" FlowDirection="LeftToRight"/>
+          </StackPanel>
+          <StackPanel Grid.Column="2">
+            <TextBlock Text="{local:T secondary}" Style="{StaticResource Label}"/>
+            <TextBox x:Name="SecondaryBox" Style="{StaticResource Input}" FontFamily="{StaticResource MonoFont}" FlowDirection="LeftToRight"/>
+          </StackPanel>
+        </Grid>
+
+        <TextBlock Text="{local:T color}" Style="{StaticResource Label}"/>
+        <ItemsControl x:Name="ColorList" Margin="-2,0,0,12">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <RadioButton GroupName="color" Style="{StaticResource Swatch}" Background="{Binding Brush}" IsChecked="{Binding IsChecked, Mode=OneTime}" Tag="{Binding Value}" Click="Color_Click"/>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <TextBlock Text="{local:T icon}" Style="{StaticResource Label}"/>
+        <ItemsControl x:Name="IconList">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <RadioButton GroupName="icon" Style="{StaticResource IconOpt}" IsChecked="{Binding IsChecked, Mode=OneTime}" Tag="{Binding Value}" Click="Icon_Click"
+                           Foreground="{StaticResource Muted}">
+                <TextBlock Text="{Binding Glyph}" FontFamily="{StaticResource IconFont}" FontSize="17"
+                           Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+              </RadioButton>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <TextBlock x:Name="ErrorText" Foreground="{StaticResource Danger}" FontSize="12" Margin="0,12,0,0" Visibility="Collapsed"/>
+      </StackPanel>
+
+      <Border Background="{StaticResource Pane}" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" CornerRadius="0,0,12,12" Padding="22,14">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+          <Button Style="{StaticResource BtnSecondary}" Content="{local:T cancel}" IsCancel="True" Click="Cancel_Click"/>
+          <Button Style="{StaticResource BtnPrimary}" Margin="8,0,0,0" Padding="20,0" IsDefault="True" Click="Save_Click">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="&#xE74E;" FontFamily="{StaticResource IconFont}" FontSize="13" VerticalAlignment="Center" Margin="0,0,7,0"/>
+              <TextBlock Text="{local:T save}"/>
+            </StackPanel>
+          </Button>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </Border>
+</Window>
