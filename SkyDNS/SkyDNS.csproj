@@ -11,7 +11,8 @@
     <AssemblyName>SkyDNS</AssemblyName>
     <RootNamespace>SkyDNS</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>1.0.0</Version>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <Version>1.1.0</Version>
     <Product>SkyDNS</Product>
     <Description>Save and switch Windows DNS servers with one click</Description>
   </PropertyGroup>

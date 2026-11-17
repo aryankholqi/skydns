@@ -70,8 +70,7 @@ public partial class MainWindow : Window
     void Delete_Click(object s, RoutedEventArgs e)
     {
         if (VM.Selected is not { } d) return;
-        var opts = Loc.I.IsRtl ? MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign : MessageBoxOptions.None;
-        if (MessageBox.Show(Loc.I.F("confirmDel", d.Name), Loc.I["appName"], MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, opts) == MessageBoxResult.Yes)
+        if (new ConfirmWindow(Loc.I.F("confirmDel", d.Name)) { Owner = this }.ShowDialog() == true)
             VM.Delete(d);
     }
 

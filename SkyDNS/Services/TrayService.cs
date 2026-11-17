@@ -82,7 +82,7 @@ public sealed class TrayService : IDisposable
             using var white = new SolidBrush(Color.FromArgb(253, 253, 254));
             g.FillEllipse(white, 6, 14, 10, 10);
             g.FillEllipse(white, 11, 8, 12, 12);
-            g.FillEllipse(white, 17, 13, 10, 10);
+            g.FillEllipse(white, 17, 14, 10, 10);
             g.FillRectangle(white, 11, 18, 11, 6);
         }
         return Icon.FromHandle(bmp.GetHicon());
