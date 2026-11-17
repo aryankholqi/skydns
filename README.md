@@ -23,11 +23,16 @@
 cd SkyDNS-Windows
 dotnet run --project SkyDNS
 ```
-یا ساخت یک فایل exe مستقل (بدون نیاز به نصب .NET روی سیستم مقصد):
+یا ساخت فایل نصبی (بدون نیاز به نصب .NET روی سیستم مقصد). به [Inno Setup 6](https://jrsoftware.org/isdl.php) نیاز دارد:
 ```bat
 build.bat
 ```
-خروجی: `publish\SkyDNS.exe`
+خروجی: `publish\SkyDNS-Setup.exe` (نصب‌کننده) و `publish\SkyDNS.exe`
+
+### انتشار نسخه جدید
+1. `<Version>` را در `SkyDNS\SkyDNS.csproj` بالا ببرید و `build.bat` را اجرا کنید.
+2. در GitHub یک Release با تگ `vX.Y.Z` بسازید و `SkyDNS-Setup.exe` را با همین نام پیوست کنید؛ به‌روزرسان داخل برنامه همین فایل را دانلود و اجرا می‌کند.
+3. `SkyDNS.exe` را هم پیوست کنید تا نسخه 1.2.0 (که خودش فایل exe را جایگزین می‌کند) هم به‌روز شود.
 
 با Visual Studio 2022: فایل `SkyDNS.sln` را باز کنید. چون برنامه دسترسی ادمین می‌خواهد، Visual Studio را هم با **Run as administrator** باز کنید تا Debug کار کند.
 

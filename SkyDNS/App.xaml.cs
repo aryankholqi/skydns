@@ -43,7 +43,7 @@ public partial class App : Application
         if (!e.Args.Contains("--tray")) ShowMain();
         if (vm.Settings.WidgetVisible) ToggleWidget(true);
 
-        UpdateService.CleanupOld();
+        UpdateService.Cleanup();
         // the app lives in the tray for days, so check at launch and then every 12 hours
         new DispatcherTimer(TimeSpan.FromHours(12), DispatcherPriority.Background, (_, _) => AutoCheck(), Dispatcher).Start();
         AutoCheck();
@@ -88,14 +88,13 @@ public partial class App : Application
         w.ShowDialog();
     }
 
-    /// <summary>Relaunch the (just swapped) exe; skips RestoreOnExit since the app comes straight back.</summary>
-    public static void RestartApp()
+    /// <summary>Run the installer silently (it relaunches the app when done) and quit so it can replace our files.
+    /// Skips RestoreOnExit since the app comes straight back.</summary>
+    public static void ExitForUpdate(string setup)
     {
+        Process.Start(new ProcessStartInfo(setup, "/SILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS") { UseShellExecute = true });
         IsExiting = true;
         _tray?.Dispose();
-        var app = (App)Current;
-        app._mutex?.ReleaseMutex(); app._mutex?.Dispose(); app._mutex = null; // let the new instance start as the first one
-        Process.Start(new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = true });
         Current.Shutdown();
     }
 

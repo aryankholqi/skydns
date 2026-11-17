@@ -24,8 +24,8 @@ public partial class UpdateWindow : Window
         Bar.Visibility = StatusText.Visibility = Visibility.Visible;
         try
         {
-            await UpdateService.InstallAsync(_u, new Progress<double>(p => { Bar.Value = p; StatusText.Text = Loc.I.F("downloading", p.ToString("P0")); }));
-            App.RestartApp();
+            var setup = await UpdateService.DownloadAsync(_u, new Progress<double>(p => { Bar.Value = p; StatusText.Text = Loc.I.F("downloading", p.ToString("P0")); }));
+            App.ExitForUpdate(setup);
         }
         catch (Exception ex)
         {
