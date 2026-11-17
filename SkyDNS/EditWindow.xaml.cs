@@ -56,8 +56,7 @@ public partial class EditWindow : Window
     void Drag(object s, MouseButtonEventArgs e) { if (e.ButtonState == MouseButtonState.Pressed) DragMove(); }
     void Cancel_Click(object s, RoutedEventArgs e) => DialogResult = false;
 
-    static bool ValidIp(string s) =>
-        s.Count(c => c == '.') == 3 && IPAddress.TryParse(s, out var a) && a.AddressFamily == AddressFamily.InterNetwork;
+    static bool ValidIp(string s) => DnsService.ValidIp(s);
 
     void ShowError(string key)
     {

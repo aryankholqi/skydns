@@ -11,10 +11,15 @@
     <WindowChrome CaptionHeight="38" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0" UseAeroCaptionButtons="False"/>
   </WindowChrome.WindowChrome>
   <Window.Resources>
+    <ResourceDictionary>
+    <ResourceDictionary.MergedDictionaries>
+      <ResourceDictionary Source="WorldMap.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
     <Style x:Key="ServerItem" TargetType="ListBoxItem" BasedOn="{StaticResource Row}">
       <EventSetter Event="PreviewMouseLeftButtonUp" Handler="Item_Click"/>
       <EventSetter Event="KeyDown" Handler="Item_KeyDown"/>
     </Style>
+    </ResourceDictionary>
   </Window.Resources>
 
   <Border x:Name="Root" BorderBrush="{StaticResource Line}" BorderThickness="1">
@@ -65,6 +70,38 @@
             <Button Grid.Column="1" Style="{StaticResource BtnIcon}" BorderBrush="{StaticResource SkySoftBorder}" Foreground="{StaticResource Sky}"
                     Content="&#xE710;" ToolTip="{local:T add}" Click="Add_Click"/>
           </Grid>
+
+          <!-- Built-in instant DNS entry (always pinned, not part of the saved list) -->
+          <Button DockPanel.Dock="Top" Margin="0,0,0,10" Height="Auto" Padding="10,8" HorizontalContentAlignment="Stretch" Click="Instant_Click">
+            <Button.Style>
+              <Style TargetType="Button" BasedOn="{StaticResource Btn}">
+                <Setter Property="BorderBrush" Value="{StaticResource Line}"/>
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding IsInstant}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource SkySoft}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource SkySoftBorder}"/>
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </Button.Style>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="34"/>
+                <ColumnDefinition/>
+              </Grid.ColumnDefinitions>
+              <Border Width="34" Height="34" CornerRadius="8" Background="{StaticResource Sky}">
+                <TextBlock Text="&#xE945;" FontFamily="{StaticResource IconFont}" FontSize="16" Foreground="{StaticResource Cloud}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <StackPanel Grid.Column="1" Margin="10,0" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Text="{local:T instant}" FontSize="13" FontWeight="Medium"/>
+                  <TextBlock Text="&#xE73E;" FontFamily="{StaticResource IconFont}" FontSize="11" FontWeight="Bold" Foreground="{StaticResource Sky}" Margin="6,0" VerticalAlignment="Center"
+                             Visibility="{Binding Instant.IsActive, Converter={StaticResource BoolVis}}"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Instant.Primary}" FontFamily="{StaticResource MonoFont}" FontSize="11" Foreground="{StaticResource Muted}" Margin="0,2,0,0"/>
+              </StackPanel>
+            </Grid>
+          </Button>
 
           <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
             <TextBox Style="{StaticResource Input}" Height="34" Padding="32,0,10,0" FontSize="12.5"
@@ -129,7 +166,61 @@
 
       <!-- Detail -->
       <Border Grid.Row="1" Grid.Column="1" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0">
-        <Grid Margin="34,28,34,22" IsEnabled="{Binding HasSelection}">
+        <Grid>
+        <!-- Instant DNS page -->
+        <StackPanel Margin="34,28,34,22" Visibility="{Binding IsInstant, Converter={StaticResource BoolVis}}">
+          <StackPanel Orientation="Horizontal">
+            <Border Width="48" Height="48" CornerRadius="12" Background="{StaticResource Sky}">
+              <TextBlock Text="&#xE945;" FontFamily="{StaticResource IconFont}" FontSize="22" Foreground="{StaticResource Cloud}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <StackPanel Margin="14,0" VerticalAlignment="Center">
+              <TextBlock Text="{local:T instant}" FontSize="24" FontWeight="Medium"/>
+              <TextBlock Text="{local:T instantD}" FontSize="12" Foreground="{StaticResource Muted}"/>
+            </StackPanel>
+          </StackPanel>
+
+          <Border Margin="0,22,0,0" Padding="24,22" CornerRadius="12" BorderThickness="1" Background="{Binding HeroBg}" BorderBrush="{Binding HeroBorder}">
+            <StackPanel>
+              <StackPanel Orientation="Horizontal">
+                <Ellipse Width="8" Height="8" Fill="{Binding StatusDot}" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding StatusTitle}" FontSize="20" FontWeight="Medium" Margin="8,0"/>
+              </StackPanel>
+              <TextBlock Text="{Binding StatusDesc}" FontSize="13" Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,8,0,18" LineHeight="20"/>
+
+              <UniformGrid Columns="2" Margin="-6,0">
+                <StackPanel Margin="6,0">
+                  <TextBlock Text="{local:T primary}" FontSize="12" Foreground="{StaticResource Muted}" Margin="0,0,0,6"/>
+                  <TextBox Style="{StaticResource Input}" FontFamily="{StaticResource MonoFont}" FlowDirection="LeftToRight" KeyDown="InstantInput_KeyDown"
+                           Text="{Binding InstantPrimary, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+                <StackPanel Margin="6,0">
+                  <TextBlock Text="{local:T secondary}" FontSize="12" Foreground="{StaticResource Muted}" Margin="0,0,0,6"/>
+                  <TextBox Style="{StaticResource Input}" FontFamily="{StaticResource MonoFont}" FlowDirection="LeftToRight" KeyDown="InstantInput_KeyDown"
+                           Text="{Binding InstantSecondary, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+              </UniformGrid>
+              <TextBlock Text="{Binding InstantError}" FontSize="12" Foreground="{StaticResource Danger}" Margin="0,8,0,0"/>
+
+              <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                <Button Style="{StaticResource BtnPrimary}" Padding="18,0" Click="InstantApply_Click" IsEnabled="{Binding NotApplying}">
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE7E8;" FontFamily="{StaticResource IconFont}" FontSize="13" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                    <TextBlock Text="{local:T apply}"/>
+                  </StackPanel>
+                </Button>
+                <Button Style="{StaticResource BtnSecondary}" Padding="18,0" Margin="8,0" Click="Disconnect_Click"
+                        Visibility="{Binding IsConnected, Converter={StaticResource BoolVis}}">
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE711;" FontFamily="{StaticResource IconFont}" FontSize="13" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                    <TextBlock Text="{local:T disconnect}"/>
+                  </StackPanel>
+                </Button>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+
+        <Grid Margin="34,28,34,22" IsEnabled="{Binding HasSelection}" Visibility="{Binding NotInstant, Converter={StaticResource BoolVis}}">
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -229,6 +320,53 @@
             </Border>
           </UniformGrid>
 
+          <!-- Public IP + location map -->
+          <Border Grid.Row="3" Margin="0,12,0,16" Padding="16,12" CornerRadius="10" BorderBrush="{StaticResource Line}" BorderThickness="1">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition/>
+              </Grid.ColumnDefinitions>
+              <StackPanel VerticalAlignment="Center">
+                <DockPanel>
+                  <Button DockPanel.Dock="Right" Style="{StaticResource BtnIcon}" Width="24" Height="24" FontSize="12" Foreground="{StaticResource Muted}"
+                          Content="&#xE72C;" ToolTip="{local:T refresh}" Click="Geo_Click"/>
+                  <TextBlock Text="{local:T yourIp}" FontSize="12" Foreground="{StaticResource Muted}" VerticalAlignment="Center"/>
+                </DockPanel>
+                <TextBlock Text="{Binding GeoIp}" FontFamily="{StaticResource MonoFont}" FontSize="17" Margin="0,6,0,0" FlowDirection="LeftToRight"
+                           HorizontalAlignment="{Binding Flow, Converter={x:Static local:FlowAlign.I}}"/>
+                <TextBlock Text="{Binding GeoPlace}" FontSize="12.5" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding GeoIsp}" FontSize="11" Foreground="{StaticResource Muted}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
+              </StackPanel>
+              <!-- map is geographic: never mirror it in RTL -->
+              <Viewbox Grid.Column="1" Margin="12,0,0,0" FlowDirection="LeftToRight">
+                <Canvas Width="360" Height="144" ClipToBounds="True">
+                  <Path Data="{StaticResource WorldLand}" Fill="{StaticResource Chip}" Stroke="{StaticResource SkySoftBorder}" StrokeThickness="0.3"/>
+                  <Canvas Canvas.Left="{Binding PinX}" Canvas.Top="{Binding PinY}"
+                          Visibility="{Binding HasGeo, Converter={StaticResource BoolVis}}">
+                    <Ellipse Width="6" Height="6" Margin="-3,-3,0,0" Fill="{StaticResource Sky}" RenderTransformOrigin="0.5,0.5">
+                      <Ellipse.RenderTransform>
+                        <ScaleTransform/>
+                      </Ellipse.RenderTransform>
+                      <Ellipse.Triggers>
+                        <EventTrigger RoutedEvent="Loaded">
+                          <BeginStoryboard>
+                            <Storyboard RepeatBehavior="Forever">
+                              <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX" From="1" To="4.5" Duration="0:0:1.6"/>
+                              <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY" From="1" To="4.5" Duration="0:0:1.6"/>
+                              <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.6" To="0" Duration="0:0:1.6"/>
+                            </Storyboard>
+                          </BeginStoryboard>
+                        </EventTrigger>
+                      </Ellipse.Triggers>
+                    </Ellipse>
+                    <Ellipse Width="6" Height="6" Margin="-3,-3,0,0" Fill="{StaticResource Sky}" Stroke="{StaticResource Cloud}" StrokeThickness="1"/>
+                  </Canvas>
+                </Canvas>
+              </Viewbox>
+            </Grid>
+          </Border>
+
           <DockPanel Grid.Row="4">
             <Button DockPanel.Dock="Right" Style="{StaticResource Btn}" Foreground="{StaticResource Danger}" Height="32" Padding="12,0" FontSize="12.5" Click="Delete_Click">
               <StackPanel Orientation="Horizontal">
@@ -251,6 +389,7 @@
               </Button>
             </StackPanel>
           </DockPanel>
+        </Grid>
         </Grid>
       </Border>
     </Grid>

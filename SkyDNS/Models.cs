@@ -79,6 +79,7 @@ public class AppSettings
     public bool FlushAfterSwitch { get; set; } = true;
     public bool RestoreOnExit { get; set; }
     public bool PingOnLaunch { get; set; } = true;
+    public bool CheckUpdates { get; set; } = true;
     public bool WidgetVisible { get; set; }
     public double? WidgetLeft { get; set; }
     public double? WidgetTop { get; set; }

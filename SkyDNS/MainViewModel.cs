@@ -36,6 +36,7 @@ public class MainViewModel : ObservableObject
     {
         Settings = Storage.Load();
         Loc.I.Lang = Settings.Language;
+        Instant.Name = T("instant");
         Servers = new ObservableCollection<DnsEntry>(Settings.Servers);
         ServersView = new ListCollectionView(Servers)
         {
@@ -55,16 +56,37 @@ public class MainViewModel : ObservableObject
     public bool SearchEmpty => _search.Length == 0;
 
     DnsEntry? _selected;
-    public DnsEntry? Selected { get => _selected; set { if (Set(ref _selected, value)) On(string.Empty); } }
+    public DnsEntry? Selected { get => _selected; set { if (Set(ref _selected, value)) { if (value != null) _instant = false; On(string.Empty); } } }
+
+    // ---------- instant DNS (built-in, never saved to the server list) ----------
+    public DnsEntry Instant { get; } = new() { Id = "instant", Icon = "lightning" };
+    bool _instant;
+    public bool IsInstant { get => _instant; set { _instant = value; if (value) _selected = null; On(string.Empty); } }
+    public bool NotInstant => !_instant;
+    public string InstantPrimary { get; set; } = "";
+    public string InstantSecondary { get; set; } = "";
+    string _instantError = "";
+    public string InstantError => _instantError;
+
+    public Task ApplyInstantAsync()
+    {
+        var p = InstantPrimary.Trim(); var s = InstantSecondary.Trim();
+        _instantError = p.Length == 0 ? T("errPrimary") : !DnsService.ValidIp(p) || (s.Length > 0 && !DnsService.ValidIp(s)) ? T("errIp") : "";
+        if (_instantError.Length > 0) { On(nameof(InstantError)); return Task.CompletedTask; }
+        Instant.Primary = p; Instant.Secondary = s;
+        if (_activeId == Instant.Id) _activeId = null; // values may have changed: force re-apply
+        return ApplyAsync(Instant);
+    }
 
     string? _activeId;
-    public DnsEntry? Active => _activeId == null ? null : Servers.FirstOrDefault(s => s.Id == _activeId);
+    public DnsEntry? Active => _activeId == null ? null : _activeId == Instant.Id ? Instant : Servers.FirstOrDefault(s => s.Id == _activeId);
 
     bool _applying, _testing;
     public bool IsApplying { get => _applying; private set { _applying = value; On(string.Empty); } }
     public bool IsTesting { get => _testing; private set { _testing = value; On(string.Empty); } }
+    public bool NotApplying => !_applying;
     public bool AnyActive => Active != null;
-    public bool IsConnected => !_applying && Active != null && Active == _selected;
+    public bool IsConnected => !_applying && Active != null && Active == (_instant ? Instant : _selected);
     public bool HasSelection => _selected != null;
     public FlowDirection Flow => Loc.I.IsRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
 
@@ -89,6 +111,25 @@ public class MainViewModel : ObservableObject
     public string WidgetSub => Active is { } a ? $"{a.Primary}  ·  {a.PingText}" : "DHCP";
     public Brush WidgetBg => AnyActive ? HeroGrad : Pane;
     public Brush WidgetBorder => AnyActive ? SoftLine : Line;
+
+    // ---------- public IP / location ----------
+    GeoInfo? _geo;
+    bool _geoLoading;
+    public bool HasGeo => _geo != null;
+    public string GeoIp => _geo?.Ip ?? (_geoLoading ? T("locating") : "—");
+    public string GeoPlace => _geo?.Place ?? (_geoLoading ? "" : T("geoFail"));
+    public string GeoIsp => _geo?.Isp ?? "";
+    // map canvas is 360x144 equirectangular: x = lon+180, y = 84-lat
+    public double PinX => (_geo?.Lon ?? 0) + 180;
+    public double PinY => Math.Clamp(84 - (_geo?.Lat ?? 0), 0, 144);
+
+    public async Task LoadGeoAsync()
+    {
+        if (_geoLoading) return;
+        _geoLoading = true; _geo = null; On(string.Empty);
+        _geo = await GeoService.LookupAsync();
+        _geoLoading = false; On(string.Empty);
+    }
 
     // ---------- adapters ----------
     public List<AdapterOption> AdapterOptions { get; private set; } = new();
@@ -135,7 +176,7 @@ public class MainViewModel : ObservableObject
     public async Task ApplyAsync(DnsEntry d)
     {
         if (_applying) return;
-        Selected = d;
+        if (d == Instant) IsInstant = true; else Selected = d;
         if (_activeId == d.Id) return;
         IsApplying = true;
         try
@@ -172,6 +213,7 @@ public class MainViewModel : ObservableObject
         _activeId = id;
         Settings.ActiveId = id;
         foreach (var s in Servers) s.IsActive = s.Id == id;
+        Instant.IsActive = id == Instant.Id;
         Save();
         On(string.Empty);
     }
@@ -185,6 +227,7 @@ public class MainViewModel : ObservableObject
             var match = current == null ? null : Servers.FirstOrDefault(s => s.Primary == current);
             _activeId = match?.Id;
             foreach (var s in Servers) s.IsActive = s.Id == _activeId;
+            Instant.IsActive = false;
             if (match != null) _selected = match;
             On(string.Empty);
         }
@@ -263,6 +306,10 @@ public class MainViewModel : ObservableObject
     public bool FlushAfterSwitch { get => Settings.FlushAfterSwitch; set { Settings.FlushAfterSwitch = value; Save(); On(); } }
     public bool RestoreOnExit { get => Settings.RestoreOnExit; set { Settings.RestoreOnExit = value; Save(); On(); } }
     public bool PingOnLaunch { get => Settings.PingOnLaunch; set { Settings.PingOnLaunch = value; Save(); On(); } }
+    public bool CheckUpdates { get => Settings.CheckUpdates; set { Settings.CheckUpdates = value; Save(); On(); } }
+    string _updateStatus = "";
+    public string UpdateStatus { get => _updateStatus; set { _updateStatus = value; On(); } }
+    public string AppVersion => Loc.I.F("version", UpdateService.Current);
 
     public bool IsFa { get => Loc.I.Lang == "fa"; set { if (value) SetLanguage("fa"); } }
     public bool IsEn { get => Loc.I.Lang == "en"; set { if (value) SetLanguage("en"); } }
@@ -273,6 +320,7 @@ public class MainViewModel : ObservableObject
         Settings.Language = lang;
         Loc.I.Lang = lang;
         Save();
+        Instant.Name = T("instant");
         foreach (var s in Servers) s.Touch();
         RefreshAdapters();
     }

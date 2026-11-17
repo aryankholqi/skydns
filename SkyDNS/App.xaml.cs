@@ -1,7 +1,10 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace SkyDNS;
 
@@ -39,6 +42,11 @@ public partial class App : Application
         _tray = new TrayService();
         if (!e.Args.Contains("--tray")) ShowMain();
         if (vm.Settings.WidgetVisible) ToggleWidget(true);
+
+        UpdateService.CleanupOld();
+        // the app lives in the tray for days, so check at launch and then every 12 hours
+        new DispatcherTimer(TimeSpan.FromHours(12), DispatcherPriority.Background, (_, _) => AutoCheck(), Dispatcher).Start();
+        AutoCheck();
         if (vm.Settings.PingOnLaunch) await vm.TestAllAsync();
     }
 
@@ -57,6 +65,38 @@ public partial class App : Application
         else _widget?.Hide();
         MainViewModel.I.Settings.WidgetVisible = visible;
         MainViewModel.I.Save();
+    }
+
+    static void AutoCheck() { if (MainViewModel.I.Settings.CheckUpdates) _ = CheckForUpdateAsync(false); }
+
+    static Version? _offered;
+
+    /// <summary>Auto checks stay silent on errors and offer each version once per session; manual checks always show.</summary>
+    public static async Task CheckForUpdateAsync(bool manual)
+    {
+        var vm = MainViewModel.I;
+        vm.UpdateStatus = Loc.I["updChecking"];
+        UpdateInfo? u;
+        try { u = await UpdateService.CheckAsync(); }
+        catch { vm.UpdateStatus = Loc.I["updFail"]; return; }
+        vm.UpdateStatus = u == null ? Loc.I["updLatest"] : Loc.I.F("updAvail", u.Version);
+        if (u == null || IsExiting || (!manual && u.Version == _offered)) return;
+        _offered = u.Version;
+        var w = new UpdateWindow(u);
+        var owner = Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive && x is not UpdateWindow) ?? (_main is { IsVisible: true } ? _main : null);
+        if (owner != null) w.Owner = owner; else w.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        w.ShowDialog();
+    }
+
+    /// <summary>Relaunch the (just swapped) exe; skips RestoreOnExit since the app comes straight back.</summary>
+    public static void RestartApp()
+    {
+        IsExiting = true;
+        _tray?.Dispose();
+        var app = (App)Current;
+        app._mutex?.ReleaseMutex(); app._mutex?.Dispose(); app._mutex = null; // let the new instance start as the first one
+        Process.Start(new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = true });
+        Current.Shutdown();
     }
 
     public static async void ExitApp()

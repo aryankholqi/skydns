@@ -21,6 +21,10 @@ public static class DnsService
 
     static DnsService() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
+    /// <summary>Strict dotted IPv4 — these strings go straight into netsh arguments.</summary>
+    public static bool ValidIp(string s) =>
+        s.Count(c => c == '.') == 3 && IPAddress.TryParse(s, out var a) && a.AddressFamily == AddressFamily.InterNetwork;
+
     [DllImport("dnsapi.dll", EntryPoint = "DnsFlushResolverCache")]
     static extern bool DnsFlushResolverCache();
 

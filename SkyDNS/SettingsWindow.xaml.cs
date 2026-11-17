@@ -14,4 +14,5 @@ public partial class SettingsWindow : Window
 
     void Drag(object s, MouseButtonEventArgs e) { if (e.ButtonState == MouseButtonState.Pressed) DragMove(); }
     void Close_Click(object s, RoutedEventArgs e) => Close();
+    void CheckNow_Click(object s, RoutedEventArgs e) => _ = App.CheckForUpdateAsync(true);
 }

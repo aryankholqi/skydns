@@ -100,6 +100,28 @@
                 <TextBlock Text="{local:T pingLaunch}" FontSize="13" Margin="0,0,12,0"/>
               </CheckBox>
             </Border>
+            <Border Padding="14,11" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0">
+              <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding CheckUpdates}">
+                <StackPanel Margin="0,0,12,0">
+                  <TextBlock Text="{local:T checkUpd}" FontSize="13"/>
+                  <TextBlock Text="{local:T checkUpdD}" FontSize="11.5" Foreground="{StaticResource Muted}" Margin="0,2,0,0"/>
+                </StackPanel>
+              </CheckBox>
+            </Border>
+            <Border Padding="14,8" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0">
+              <DockPanel>
+                <Button DockPanel.Dock="Right" Style="{StaticResource BtnSecondary}" Height="30" Padding="12,0" FontSize="12" Click="CheckNow_Click">
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE72C;" FontFamily="{StaticResource IconFont}" FontSize="12" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                    <TextBlock Text="{local:T checkNow}"/>
+                  </StackPanel>
+                </Button>
+                <StackPanel VerticalAlignment="Center">
+                  <TextBlock Text="{Binding AppVersion}" FontSize="13"/>
+                  <TextBlock Text="{Binding UpdateStatus}" FontSize="11.5" Foreground="{StaticResource Muted}" Margin="0,2,0,0"/>
+                </StackPanel>
+              </DockPanel>
+            </Border>
           </StackPanel>
         </Border>
 

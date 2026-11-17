@@ -18,6 +18,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DataContext = VM;
+        _ = VM.LoadGeoAsync();
         StateChanged += (_, _) =>
         {
             bool max = WindowState == WindowState.Maximized;
@@ -57,6 +58,11 @@ public partial class MainWindow : Window
     }
 
     void Toggle_Click(object s, RoutedEventArgs e) => _ = VM.ToggleAsync();
+    void Instant_Click(object s, RoutedEventArgs e) => VM.IsInstant = true;
+    void InstantApply_Click(object s, RoutedEventArgs e) => _ = VM.ApplyInstantAsync();
+    void InstantInput_KeyDown(object s, KeyEventArgs e) { if (e.Key == Key.Enter) { e.Handled = true; _ = VM.ApplyInstantAsync(); } }
+    void Disconnect_Click(object s, RoutedEventArgs e) => _ = VM.DisconnectAsync();
+    void Geo_Click(object s, RoutedEventArgs e) => _ = VM.LoadGeoAsync();
     void TestAll_Click(object s, RoutedEventArgs e) => _ = VM.TestAllAsync();
     void Test_Click(object s, RoutedEventArgs e) => _ = VM.TestOneAsync(VM.Selected);
 
