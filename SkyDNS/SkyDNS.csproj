@@ -12,7 +12,7 @@
     <RootNamespace>SkyDNS</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>app.ico</ApplicationIcon>
-    <Version>1.5.0</Version>
+    <Version>1.5.1</Version>
     <Product>SkyDNS</Product>
     <Description>Save and switch Windows DNS servers with one click</Description>
   </PropertyGroup>

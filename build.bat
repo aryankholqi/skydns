@@ -1,5 +1,5 @@
 @echo off
-REM Builds publish\SkyDNS.exe (single self-contained exe) and publish\SkyDNS-Setup.exe (installer)
+REM Builds publish\SkyDNS.exe (single self-contained exe) and publish\SkyDNS-Setup-X.Y.Z.exe (installer)
 dotnet publish SkyDNS\SkyDNS.csproj -c Release -r win-x64 --self-contained true ^
   -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish
 if errorlevel 1 goto :fail
@@ -14,7 +14,7 @@ if not defined ISCC (
 if errorlevel 1 goto :fail
 
 echo.
-echo Done: publish\SkyDNS-Setup.exe
+echo Done: publish\SkyDNS-Setup-*.exe
 pause
 exit /b 0
 

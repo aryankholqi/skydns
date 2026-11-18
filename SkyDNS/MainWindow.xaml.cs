@@ -25,6 +25,7 @@ public partial class MainWindow : Window
             Root.Margin = max ? new Thickness(7) : new Thickness(0);
             Root.CornerRadius = new CornerRadius(max ? 0 : 12);
             Side.CornerRadius = new CornerRadius(0, 0, 0, max ? 0 : 11);
+            CloseBtn.Tag = new CornerRadius(0, max ? 0 : 11, 0, 0);
             MaxBtn.Content = max ? "\uE923" : "\uE922";
         };
     }

@@ -49,7 +49,9 @@
           <Button Style="{StaticResource Caption}" Content="&#xE8A9;" FontSize="12" ToolTip="{local:T widget}" Click="Widget_Click"/>
           <Button Style="{StaticResource Caption}" Content="&#xE921;" Click="Min_Click"/>
           <Button x:Name="MaxBtn" Style="{StaticResource Caption}" Content="&#xE922;" Click="Max_Click"/>
-          <Button Style="{StaticResource CaptionClose}" Content="&#xE8BB;" Click="Close_Click"/>
+          <Button x:Name="CloseBtn" Style="{StaticResource CaptionClose}" Content="&#xE8BB;" Click="Close_Click">
+            <Button.Tag><CornerRadius>0,11,0,0</CornerRadius></Button.Tag>
+          </Button>
         </StackPanel>
       </Grid>
 

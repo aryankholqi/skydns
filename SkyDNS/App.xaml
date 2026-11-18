@@ -130,7 +130,8 @@
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="Button">
-            <Border x:Name="bd" Background="Transparent">
+            <!-- Tag holds the CornerRadius so the top corner matches the window's rounded corner (set in MainWindow) -->
+            <Border x:Name="bd" Background="Transparent" CornerRadius="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}">
               <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
             <ControlTemplate.Triggers>
@@ -142,6 +143,61 @@
           </ControlTemplate>
         </Setter.Value>
       </Setter>
+    </Style>
+
+    <!-- Thin rounded scrollbar for every ScrollViewer: no arrows, no track -->
+    <Style x:Key="ScrollThumb" TargetType="Thumb">
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Thumb">
+            <Border x:Name="bd" CornerRadius="3" Background="#C3CCD8"/>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="#9AA6B5"/>
+              </Trigger>
+              <Trigger Property="IsDragging" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="#7D8A9B"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style TargetType="ScrollBar">
+      <Setter Property="Width" Value="6"/>
+      <Setter Property="MinWidth" Value="6"/>
+      <Setter Property="Margin" Value="0,2,2,2"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ScrollBar">
+            <Track x:Name="PART_Track" IsDirectionReversed="True">
+              <Track.Thumb>
+                <Thumb Style="{StaticResource ScrollThumb}"/>
+              </Track.Thumb>
+            </Track>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+      <Style.Triggers>
+        <Trigger Property="Orientation" Value="Horizontal">
+          <Setter Property="Width" Value="Auto"/>
+          <Setter Property="MinWidth" Value="0"/>
+          <Setter Property="Height" Value="6"/>
+          <Setter Property="MinHeight" Value="6"/>
+          <Setter Property="Margin" Value="2,0,2,2"/>
+          <Setter Property="Template">
+            <Setter.Value>
+              <ControlTemplate TargetType="ScrollBar">
+                <Track x:Name="PART_Track">
+                  <Track.Thumb>
+                    <Thumb Style="{StaticResource ScrollThumb}"/>
+                  </Track.Thumb>
+                </Track>
+              </ControlTemplate>
+            </Setter.Value>
+          </Setter>
+        </Trigger>
+      </Style.Triggers>
     </Style>
 
     <!-- Power button (bound to MainViewModel) -->

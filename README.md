@@ -27,11 +27,11 @@ dotnet run --project SkyDNS
 ```bat
 build.bat
 ```
-خروجی: `publish\SkyDNS-Setup.exe` (نصب‌کننده) و `publish\SkyDNS.exe`
+خروجی: `publish\SkyDNS-Setup-X.Y.Z.exe` (نصب‌کننده) و `publish\SkyDNS.exe`
 
 ### انتشار نسخه جدید
 1. `<Version>` را در `SkyDNS\SkyDNS.csproj` بالا ببرید و `build.bat` را اجرا کنید.
-2. در GitHub یک Release با تگ `vX.Y.Z` بسازید و `SkyDNS-Setup.exe` را با همین نام پیوست کنید؛ به‌روزرسان داخل برنامه همین فایل را دانلود و اجرا می‌کند.
+2. در GitHub یک Release با تگ `vX.Y.Z` بسازید و `SkyDNS-Setup-X.Y.Z.exe` را پیوست کنید؛ به‌روزرسان داخل برنامه همین فایل را دانلود و اجرا می‌کند. برای کاربران نسخه‌های قبل از 1.5.1 یک کپی با نام `SkyDNS-Setup.exe` هم پیوست کنید.
 3. `SkyDNS.exe` را هم پیوست کنید تا نسخه 1.2.0 (که خودش فایل exe را جایگزین می‌کند) هم به‌روز شود.
 
 با Visual Studio 2022: فایل `SkyDNS.sln` را باز کنید. برنامه بدون دسترسی ادمین اجرا می‌شود و فقط هنگام تغییر DNS پنجره‌ی UAC نمایش داده می‌شود.

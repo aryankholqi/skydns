@@ -1,5 +1,5 @@
 ; SkyDNS installer (Inno Setup 6). Built by build.bat from publish\SkyDNS.exe.
-; The in-app updater downloads the release asset "SkyDNS-Setup.exe" and runs it with /SILENT.
+; The in-app updater downloads the release asset "SkyDNS-Setup-X.Y.Z.exe" (versions before 1.5.1 look for "SkyDNS-Setup.exe") and runs it with /SILENT.
 
 #define Exe "..\publish\SkyDNS.exe"
 #define Major 0
@@ -29,7 +29,7 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
 OutputDir=..\publish
-OutputBaseFilename=SkyDNS-Setup
+OutputBaseFilename=SkyDNS-Setup-{#AppVer}
 SetupIconFile=..\SkyDNS\app.ico
 UninstallDisplayIcon={app}\SkyDNS.exe
 UninstallDisplayName=SkyDNS

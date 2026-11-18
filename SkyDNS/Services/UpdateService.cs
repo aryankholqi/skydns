@@ -9,12 +9,13 @@ namespace SkyDNS;
 
 public record UpdateInfo(Version Version, string Url, long Size);
 
-/// <summary>Updates from GitHub Releases: tag "vX.Y.Z" with a "SkyDNS-Setup.exe" asset (Inno Setup installer).</summary>
+/// <summary>Updates from GitHub Releases: tag "vX.Y.Z" with a "SkyDNS-Setup-X.Y.Z.exe" asset (Inno Setup installer).</summary>
 public static class UpdateService
 {
     const string Api = "https://api.github.com/repos/aryankholqi/skydns/releases/latest";
     const string DownloadPrefix = "https://github.com/aryankholqi/skydns/releases/download/";
-    const string Asset = "SkyDNS-Setup.exe";
+    const string Asset = "SkyDNS-Setup.exe"; // local file name; release assets are "SkyDNS-Setup-X.Y.Z.exe" (or this legacy name)
+    static bool IsSetup(string? n) => n != null && n.StartsWith("SkyDNS-Setup", StringComparison.OrdinalIgnoreCase) && n.EndsWith(".exe", StringComparison.OrdinalIgnoreCase);
     static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(30), DefaultRequestHeaders = { UserAgent = { new ProductInfoHeaderValue("SkyDNS", "1") } } };
 
     static Version Norm(Version v) => new(v.Major, v.Minor, Math.Max(0, v.Build)); // 1.2.0.0 == 1.2.0
@@ -32,7 +33,7 @@ public static class UpdateService
         var r = doc.RootElement;
         if (!Version.TryParse(r.GetProperty("tag_name").GetString()?.TrimStart('v', 'V'), out var v) || Norm(v) <= Current) return null;
         foreach (var a in r.GetProperty("assets").EnumerateArray())
-            if (a.GetProperty("name").GetString() == Asset && a.GetProperty("browser_download_url").GetString() is { } url && url.StartsWith(DownloadPrefix))
+            if (IsSetup(a.GetProperty("name").GetString()) && a.GetProperty("browser_download_url").GetString() is { } url && url.StartsWith(DownloadPrefix))
                 return new(Norm(v), url, a.GetProperty("size").GetInt64());
         return null;
     }
