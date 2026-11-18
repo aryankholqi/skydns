@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:SkyDNS"
         Title="SkyDNS" Width="980" Height="640" MinWidth="860" MinHeight="580"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource Cloud}" Foreground="{StaticResource Ink}"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent" Foreground="{StaticResource Ink}"
         FontFamily="{StaticResource UiFont}" FlowDirection="{Binding Flow}"
         UseLayoutRounding="True">
   <WindowChrome.WindowChrome>
@@ -22,7 +22,7 @@
     </ResourceDictionary>
   </Window.Resources>
 
-  <Border x:Name="Root" BorderBrush="{StaticResource Line}" BorderThickness="1">
+  <Border x:Name="Root" Background="{StaticResource Cloud}" CornerRadius="12" BorderBrush="{StaticResource Line}" BorderThickness="1">
     <Grid>
       <Grid.RowDefinitions>
         <RowDefinition Height="38"/>
@@ -54,7 +54,7 @@
       </Grid>
 
       <!-- Sidebar -->
-      <Border Grid.Row="1" Background="{StaticResource Pane}" BorderBrush="{StaticResource Line}" BorderThickness="0,1,1,0">
+      <Border x:Name="Side" Grid.Row="1" Background="{StaticResource Pane}" CornerRadius="0,0,0,11" BorderBrush="{StaticResource Line}" BorderThickness="0,1,1,0">
         <DockPanel Margin="12,14,12,10">
           <Grid DockPanel.Dock="Top" Margin="4,0,4,10">
             <Grid.ColumnDefinitions>
@@ -341,7 +341,7 @@
               <!-- map is geographic: never mirror it in RTL -->
               <Viewbox Grid.Column="1" Margin="12,0,0,0" FlowDirection="LeftToRight">
                 <Canvas Width="360" Height="144" ClipToBounds="True">
-                  <Path Data="{StaticResource WorldLand}" Fill="{StaticResource Chip}" Stroke="{StaticResource SkySoftBorder}" StrokeThickness="0.3"/>
+                  <Path Data="{StaticResource WorldLand}" Fill="#D6DEE9"/>
                   <Canvas Canvas.Left="{Binding PinX}" Canvas.Top="{Binding PinY}"
                           Visibility="{Binding HasGeo, Converter={StaticResource BoolVis}}">
                     <Ellipse Width="6" Height="6" Margin="-3,-3,0,0" Fill="{StaticResource Sky}" RenderTransformOrigin="0.5,0.5">

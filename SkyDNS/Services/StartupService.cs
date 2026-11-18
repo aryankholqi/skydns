@@ -8,8 +8,8 @@ using System.Text;
 namespace SkyDNS;
 
 /// <summary>
-/// Launch at sign-in via Task Scheduler with highest privileges,
-/// so the elevated app starts without a UAC prompt.
+/// Launch at sign-in via Task Scheduler as the normal user
+/// (the app no longer runs elevated).
 /// </summary>
 public static class StartupService
 {
@@ -24,7 +24,7 @@ public static class StartupService
             var xml = $@"<?xml version=""1.0"" encoding=""UTF-16""?>
 <Task version=""1.2"" xmlns=""http://schemas.microsoft.com/windows/2004/02/mit/task"">
   <Triggers><LogonTrigger><Enabled>true</Enabled><UserId>{user}</UserId></LogonTrigger></Triggers>
-  <Principals><Principal id=""Author""><UserId>{user}</UserId><LogonType>InteractiveToken</LogonType><RunLevel>HighestAvailable</RunLevel></Principal></Principals>
+  <Principals><Principal id=""Author""><UserId>{user}</UserId><LogonType>InteractiveToken</LogonType><RunLevel>LeastPrivilege</RunLevel></Principal></Principals>
   <Settings>
     <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
     <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>

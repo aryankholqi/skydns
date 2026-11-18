@@ -4,8 +4,8 @@
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
-        <!-- Changing DNS requires administrator rights -->
-        <requestedExecutionLevel level="requireAdministrator" uiAccess="false"/>
+        <!-- Runs as normal user; DnsService elevates only the netsh call (one UAC prompt per change) -->
+        <requestedExecutionLevel level="asInvoker" uiAccess="false"/>
       </requestedPrivileges>
     </security>
   </trustInfo>

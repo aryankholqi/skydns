@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -61,12 +62,14 @@ public static class DnsService
     {
         var list = adapters.ToList();
         if (list.Count == 0) throw new InvalidOperationException(Loc.I["errNoAdapter"]);
+        var cmds = new List<string>();
         foreach (var a in list)
         {
-            await Netsh($"interface ipv4 set dnsservers name=\"{a}\" source=static address={primary} register=primary validate=no");
+            cmds.Add($"interface ipv4 set dnsservers name=\"{a}\" source=static address={primary} register=primary validate=no");
             if (!string.IsNullOrWhiteSpace(secondary))
-                await Netsh($"interface ipv4 add dnsservers name=\"{a}\" address={secondary} index=2 validate=no");
+                cmds.Add($"interface ipv4 add dnsservers name=\"{a}\" address={secondary} index=2 validate=no");
         }
+        await Netsh(cmds);
         if (flush) DnsFlushResolverCache();
     }
 
@@ -74,9 +77,32 @@ public static class DnsService
     {
         var list = adapters.ToList();
         if (list.Count == 0) throw new InvalidOperationException(Loc.I["errNoAdapter"]);
-        foreach (var a in list)
-            await Netsh($"interface ipv4 set dnsservers name=\"{a}\" source=dhcp");
+        await Netsh(list.Select(a => $"interface ipv4 set dnsservers name=\"{a}\" source=dhcp").ToList());
         if (flush) DnsFlushResolverCache();
+    }
+
+    static bool IsAdmin => new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
+
+    static async Task Netsh(List<string> cmds)
+    {
+        if (IsAdmin) { foreach (var c in cmds) await Netsh(c); return; }
+        // App runs unelevated: chain all commands in one elevated cmd so the user sees a single UAC prompt.
+        // shortcut: elevated output can't be redirected, so errors show only the exit code.
+        var psi = new ProcessStartInfo("cmd.exe", "/c " + string.Join(" && ", cmds.Select(c => "netsh " + c)))
+        {
+            UseShellExecute = true,
+            Verb = "runas",
+            WindowStyle = ProcessWindowStyle.Hidden,
+        };
+        Process p;
+        try { p = Process.Start(psi) ?? throw new InvalidOperationException("netsh failed to start"); }
+        catch (System.ComponentModel.Win32Exception ex) when (ex.NativeErrorCode == 1223) // user clicked No on UAC
+        { throw new InvalidOperationException("Administrator permission was denied."); }
+        using (p)
+        {
+            await p.WaitForExitAsync();
+            if (p.ExitCode != 0) throw new InvalidOperationException($"netsh exit code {p.ExitCode}");
+        }
     }
 
     static async Task Netsh(string args)
