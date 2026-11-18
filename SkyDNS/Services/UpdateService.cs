@@ -20,9 +20,10 @@ public static class UpdateService
     static Version Norm(Version v) => new(v.Major, v.Minor, Math.Max(0, v.Build)); // 1.2.0.0 == 1.2.0
     public static Version Current => Norm(typeof(UpdateService).Assembly.GetName().Version!);
 
-    // next to the exe, not %TEMP%: the elevated app runs this file, so it must sit where only the install's owner can write
     static string Dir => Path.GetDirectoryName(Environment.ProcessPath!)!;
-    static string SetupPath => Path.Combine(Dir, Asset);
+    // the app runs unelevated and can't write to Program Files; the installer elevates itself via UAC
+    static string CacheDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SkyDNS");
+    static string SetupPath => Path.Combine(CacheDir, Asset);
 
     /// <summary>Newer release, or null when up to date. Throws on network/API errors.</summary>
     public static async Task<UpdateInfo?> CheckAsync()
@@ -40,6 +41,7 @@ public static class UpdateService
     public static async Task<string> DownloadAsync(UpdateInfo u, IProgress<double> progress)
     {
         var path = SetupPath;
+        Directory.CreateDirectory(CacheDir);
         try
         {
             using var res = await Http.GetAsync(u.Url, HttpCompletionOption.ResponseHeadersRead);
@@ -63,7 +65,7 @@ public static class UpdateService
     /// <summary>Remove the installer from the last update, and the exe left by 1.2.0's in-place swap.</summary>
     public static void Cleanup()
     {
-        foreach (var f in new[] { SetupPath, Path.Combine(Dir, "SkyDNS.old.exe") })
+        foreach (var f in new[] { SetupPath, Path.Combine(Dir, Asset), Path.Combine(Dir, "SkyDNS.old.exe") })
             try { File.Delete(f); } catch { }
     }
 }

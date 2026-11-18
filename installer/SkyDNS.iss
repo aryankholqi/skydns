@@ -23,7 +23,7 @@ VersionInfoVersion={#AppVer}
 DefaultDirName={autopf}\SkyDNS
 DefaultGroupName=SkyDNS
 DisableProgramGroupPage=yes
-; the app needs admin to change DNS, so install machine-wide
+; install machine-wide into Program Files (the app itself runs unelevated)
 PrivilegesRequired=admin
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
