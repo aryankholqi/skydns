@@ -78,11 +78,11 @@
           </Grid.ColumnDefinitions>
           <StackPanel>
             <TextBlock Text="{local:T primary}" Style="{StaticResource Label}"/>
-            <TextBox x:Name="PrimaryBox" Style="{StaticResource Input}" FontFamily="{StaticResource MonoFont}" FlowDirection="LeftToRight"/>
+            <local:IpBox x:Name="PrimaryBox"/>
           </StackPanel>
           <StackPanel Grid.Column="2">
             <TextBlock Text="{local:T secondary}" Style="{StaticResource Label}"/>
-            <TextBox x:Name="SecondaryBox" Style="{StaticResource Input}" FontFamily="{StaticResource MonoFont}" FlowDirection="LeftToRight"/>
+            <local:IpBox x:Name="SecondaryBox"/>
           </StackPanel>
         </Grid>
 
