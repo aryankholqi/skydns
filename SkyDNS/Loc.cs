@@ -11,13 +11,13 @@ public class Loc : INotifyPropertyChanged
     public static Loc I { get; } = new();
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    string _lang = "fa";
+    string _lang = "en";
     public string Lang
     {
         get => _lang;
         set
         {
-            _lang = value == "en" ? "en" : "fa";
+            _lang = value == "fa" ? "fa" : "en";
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Binding.IndexerName));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsRtl)));
         }

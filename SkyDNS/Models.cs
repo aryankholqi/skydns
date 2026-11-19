@@ -72,7 +72,7 @@ public class DnsEntry : ObservableObject
 
 public class AppSettings
 {
-    public string Language { get; set; } = "fa";
+    public string Language { get; set; } = "en";
     public string Adapter { get; set; } = "auto";
     public bool Startup { get; set; }
     public bool MinimizeToTray { get; set; } = true;
