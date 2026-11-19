@@ -38,6 +38,8 @@ public partial class App : Application
         vm.Error += msg => MessageBox.Show(msg, Loc.I["appName"], MessageBoxButton.OK, MessageBoxImage.Warning,
             MessageBoxResult.OK, Loc.I.IsRtl ? MessageBoxOptions.RtlReading | MessageBoxOptions.RightAlign : MessageBoxOptions.None);
         vm.DetectActive();
+        // Re-register so tasks from older versions (LeastPrivilege) can start the now-elevated exe.
+        if (vm.Settings.Startup) try { StartupService.Set(true); } catch { }
 
         _tray = new TrayService();
         if (!e.Args.Contains("--tray")) ShowMain();

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
-  <assemblyIdentity version="1.5.1.0" name="SkyDNS.app"/>
+  <assemblyIdentity version="1.6.0.0" name="SkyDNS.app"/>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
-        <!-- Runs as normal user; DnsService elevates only the netsh call (one UAC prompt per change) -->
-        <requestedExecutionLevel level="asInvoker" uiAccess="false"/>
+        <!-- Elevated once at launch so DNS changes don't show a UAC prompt each time -->
+        <requestedExecutionLevel level="requireAdministrator" uiAccess="false"/>
       </requestedPrivileges>
     </security>
   </trustInfo>

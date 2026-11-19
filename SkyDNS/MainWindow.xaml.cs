@@ -46,14 +46,10 @@ public partial class MainWindow : Window
         base.OnClosing(e);
     }
 
-    void Item_Click(object sender, MouseButtonEventArgs e)
-    {
-        if (sender is FrameworkElement { DataContext: DnsEntry d }) _ = VM.ApplyAsync(d);
-    }
-
+    // Selecting only picks the server; Enter (or the Connect button) applies it.
     void Item_KeyDown(object sender, KeyEventArgs e)
     {
-        if ((e.Key == Key.Enter || e.Key == Key.Space) && sender is FrameworkElement { DataContext: DnsEntry d })
+        if (e.Key == Key.Enter && sender is FrameworkElement { DataContext: DnsEntry d })
         {
             _ = VM.ApplyAsync(d);
             e.Handled = true;

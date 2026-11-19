@@ -23,7 +23,7 @@ VersionInfoVersion={#AppVer}
 DefaultDirName={autopf}\SkyDNS
 DefaultGroupName=SkyDNS
 DisableProgramGroupPage=yes
-; install machine-wide into Program Files (the app itself runs unelevated)
+; install machine-wide into Program Files (the app itself requires admin)
 PrivilegesRequired=admin
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
@@ -52,9 +52,10 @@ Name: "{autodesktop}\SkyDNS"; Filename: "{app}\SkyDNS.exe"; Tasks: desktopicon
 
 [Run]
 ; interactive install: optional "Launch SkyDNS" checkbox on the last page
-Filename: "{app}\SkyDNS.exe"; Description: "{cm:LaunchProgram,SkyDNS}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\SkyDNS.exe"; Description: "{cm:LaunchProgram,SkyDNS}"; Flags: nowait postinstall skipifsilent runascurrentuser
 ; silent install (in-app update): always relaunch
-Filename: "{app}\SkyDNS.exe"; Flags: nowait skipifnotsilent
+; runascurrentuser: the exe is requireAdministrator, so launch it from the elevated installer
+Filename: "{app}\SkyDNS.exe"; Flags: nowait skipifnotsilent runascurrentuser
 
 [UninstallRun]
 Filename: "{sys}\taskkill.exe"; Parameters: "/f /im SkyDNS.exe"; Flags: runhidden; RunOnceId: "KillApp"

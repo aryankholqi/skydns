@@ -16,7 +16,6 @@
       <ResourceDictionary Source="WorldMap.xaml"/>
     </ResourceDictionary.MergedDictionaries>
     <Style x:Key="ServerItem" TargetType="ListBoxItem" BasedOn="{StaticResource Row}">
-      <EventSetter Event="PreviewMouseLeftButtonUp" Handler="Item_Click"/>
       <EventSetter Event="KeyDown" Handler="Item_KeyDown"/>
     </Style>
     </ResourceDictionary>
